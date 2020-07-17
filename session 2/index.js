@@ -28,6 +28,7 @@ const main = async function() {
   })
 
   const data = await service.getData()
+  console.log(data)
 
   /*
   console.log(interval)
