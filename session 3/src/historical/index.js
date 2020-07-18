@@ -52,7 +52,7 @@ class HistoricalService {
         const interval = intervals[0]
 
         const result = await this.performRequest(interval).then(r => r.reverse())
-        await timeout(1 / 3)
+        await timeout(400)
         const next = await this.performInterval(intervals.slice(1))
         return result.concat(next)
     }
