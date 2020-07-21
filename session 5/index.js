@@ -1,5 +1,6 @@
 const program = require('commander')
 const Backtester = require('./src/backtester')
+const Trader = require('./src/trader')
 const config = require('./configuration')
 const Ticker = require('./src/ticker')
 
@@ -16,19 +17,26 @@ program.version('1.0.0')
   .option('-s, --start [start]', 'Start time in unix seconds', toDate, yesterday)
   .option('-e, --end [end]', 'End time in unix seconds', toDate, now)
   .option('-t, --strategy [strategy]', 'Strategy Type')
+  .option('-l, --live', 'Run live')
   .parse(process.argv)
 
 
 const main = async function() {
-  const { interval, product, start, end, strategy } = program
+  const { interval, product, start, end, strategy, live } = program
 
-  
-  const tester = new Backtester({
-    start, end, product, interval, strategyType: strategy
-  })
+  if (live) {
+    const trader = new Trader({ 
+      start, end, product, interval, strategyType: strategy
+    })
 
-  await tester.start()
+    await trader.start()
+  } else {
+    const tester = new Backtester({
+      start, end, product, interval, strategyType: strategy
+    })
 
+    await tester.start()
+  }
   /*
   console.log(interval)
   console.log(product)

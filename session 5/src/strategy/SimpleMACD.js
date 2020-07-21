@@ -35,7 +35,6 @@ class SimpleMACD extends Strategy {
 
     if (open.length == 0) {
       if (wasAbove && isBelow) {
-        console.log('hello')
         this.onBuySignal({ price, time })
         
       }
