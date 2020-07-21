@@ -1,9 +1,8 @@
-const Trade = require("../models/trade");
-
 const Runner = require('../runner')
 const Ticker = require('../ticker');
-const Candlestick = require("../models/candlestick");
-const { parse } = require("commander");
+const Candlestick = require("../models/candlestick")
+const randomstring = require('randomstring')
+const colors = require('colors/safe')
 
 class Trader extends Runner {
 
@@ -20,10 +19,11 @@ class Trader extends Runner {
     async start() {
         this.currentCandle = null
         this.history = await this.historical.getData()
-         this.ticker.start()
+        this.ticker.start()
     }
 
     async onBuySignal({ price, time }) {
+        console.log(`BUY BUY BUY  ${price}`)
         const id = randomstring.generate(20)
         this.strategy.positionOpened({
             price, time, size: 1.0, id
@@ -32,6 +32,7 @@ class Trader extends Runner {
     }
 
     async onSellSignal({ price, size, time, position }) {
+        console.log(`SELL SELL SELL ${price}`)
         this.strategy.positionClosed({
             price, time, size, id: position.id
         })
@@ -39,10 +40,11 @@ class Trader extends Runner {
 
     async onTick (tick) {
         const parsed = Date.parse(tick.time)
-        const time = isNaN(parsed) ? new Date() : parsed
+        const time = isNaN(parsed) ? new Date() : new Date(parsed)
         const price = parseFloat(tick.price)
-        const volume = parseFloat(tick.volume)
-        console.log(`Time: ${time}  Price: ${price}`)
+        const volume = parseFloat(tick.last_size)
+
+    console.log(`Time: ${time}  Price: ${price.toFixed(2)}  Volume: ${volume}`)
         
         try {
 
@@ -69,6 +71,10 @@ class Trader extends Runner {
                 const candle = this.currentCandle
                 this.currentCandle = null
                 this.history.push(candle)
+
+                this.printPositions()
+                this.printProfit()
+
             }
         } catch (error) { console.log(error)}
     }
